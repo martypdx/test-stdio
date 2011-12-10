@@ -47,34 +47,44 @@ There is also a `log` method that can be used since `console.log` is redirected 
 
     stdout.log('This will not be routed back to mocked stdout')
     
-### Combining `stdin` and `stdout`
+### Combining stdin and stdout
 
 These can be combine to test workflows:
 
     stdout.expect(prompt, function() {
-        program.prompt(prompt, Date, test(expected));
+        var actual
+        program.prompt(prompt, Number, function(val) { 
+            actual = val
+        })
         
-        stdout.expect(prompt + '(must be a date) ', function() {
-        stdin.write('blue');    
+        stdout.expect(prompt + '(must be a number) ', function() {
+            stdin.write('blue')    
         })
-        stdout.expect(prompt + '(must be a date) ', function() {
-        stdin.write('blue');    
+        stdout.expect(prompt + '(must be a number) ', function() {
+            stdin.write('blue')
         })
-        stdin.write(expected.toString());    
+        stdin.write(42)  
+        assert.strictEqual(actual, 42)
     })
     
 or multi-line input:
 
     stdout.expect(prompt + '\n', function() {
-        program.prompt(prompt, test('hello world\n  and what a world\nit could be'));
+        var actual
+        program.prompt(prompt, function(val) {
+            actual = val
+        }
+        
         stdin.write('hello world\n');
         stdin.write('  and what a world\n');
         stdin.write('it could be\n');
         stdin.write('\n');
+        
+        assert.strictEqual(actual, 'hello world\n  and what a world\nit could be')
     })
 
     
-### .real` and revert()
+### .real and revert()
 
 Each mock also exposes a `.real` property that can be used to access the original stdio:
 
@@ -84,7 +94,7 @@ Call `revert` to restore process to use original stdio:
 
     stdin.revert()
     
-There's not currently any way to resume use of the same mock object, call .stdin() again to recreate a mock. 
+There's not currently any way to resume use of the same mock object, call .stdin() again to create a new mock. 
 
 
     
