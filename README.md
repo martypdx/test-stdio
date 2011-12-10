@@ -4,5 +4,6 @@ test-stdio is a micro-library for testing cli and other uses of process stdin, s
 
 ## Usage
 
+Module
     var stdin = require('../test-stdio').stdin()
-    stdin.write('hello world'dfdfdfdfdf)
+    stdin.write('hello world')
