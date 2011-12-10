@@ -22,7 +22,7 @@ test-stdio is designed for testing node modules via require.
 
 `process.stdout` and `process.stderr` are mocked by calling `stdout()` and `stderr()` respectively.
 Both have an `expect(expected, fn)` method that 
-can be used to test stdout output. It takes an expected value and a function that will 
+can be used to test std output. It takes an expected value and a function that will 
 run the code that will produce the output:
 
     var stdout = require('../test-stdio').stdout()
@@ -39,7 +39,7 @@ run the code that will produce the output:
             return actual === 'hello world'
         }, 
         function(){
-            myProgram.sayHello() //writes 'hello world' to stdout   
+            myProgram.sayHello()   
         }
     )
     
@@ -47,7 +47,34 @@ There is also a `log` method that can be used since `console.log` is redirected 
 
     stdout.log('This will not be routed back to mocked stdout')
     
-### `.real` and `revert()`
+### Combining `stdin` and `stdout`
+
+These can be combine to test workflows:
+
+    stdout.expect(prompt, function() {
+        program.prompt(prompt, Date, test(expected));
+        
+        stdout.expect(prompt + '(must be a date) ', function() {
+        stdin.write('blue');    
+        })
+        stdout.expect(prompt + '(must be a date) ', function() {
+        stdin.write('blue');    
+        })
+        stdin.write(expected.toString());    
+    })
+    
+or multi-line input:
+
+    stdout.expect(prompt + '\n', function() {
+        program.prompt(prompt, test('hello world\n  and what a world\nit could be'));
+        stdin.write('hello world\n');
+        stdin.write('  and what a world\n');
+        stdin.write('it could be\n');
+        stdin.write('\n');
+    })
+
+    
+### .real` and revert()
 
 Each mock also exposes a `.real` property that can be used to access the original stdio:
 
